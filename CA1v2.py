@@ -53,8 +53,11 @@ class CaesarCipherAnalyzer:
 ########################################################################################################################################################
 # global.)
 
-    def readfile(self, input_message):
-        input_file_name = input(input_message)
+    def writefile(self, content, output_file_name):
+        with open(output_file_name, 'w') as output_file:
+            output_file.write(content)
+
+    def readfile(self, input_file_name):
         with open(input_file_name, 'r') as input_file:
             return input_file.read()
 
@@ -69,11 +72,11 @@ class CaesarCipherAnalyzer:
                 return encrypted_char if is_upper else encrypted_char.lower()
         return char
 
-    def encrypt_key(self, text, key):
-        return ''.join(self.shift_char(char, key) for char in text)
+    def encrypt_key(self, string, key):
+        return ''.join(self.shift_char(char, key) for char in string)
 
-    def decrypt_key(self, cipher, key):
-        return ''.join(self.shift_char(char, -key) for char in cipher)
+    def decrypt_key(self, string, key):
+        return ''.join(self.shift_char(char, -key) for char in string)
 
     def calculate_letter_frequencies(self, text):
         text = text.lower()
@@ -215,13 +218,12 @@ class CaesarCipherAnalyzer:
         key = int(input('Enter the cipher key: '))
 
         output_file = input("\nPlease enter a output file: ")
-
         with open(input_file, 'r') as input_file, open(output_file, 'w') as output:
             for line in input_file:
                 if option == 'E':
-                    encrypted_line = self.encrypt_key(line.strip(), key)
+                    encrypted_line = self.encrypt_key(line, key)
                 else:
-                    encrypted_line = self.decrypt_key(line.strip(), key)
+                    encrypted_line = self.decrypt_key(line, key)
                 output.write(encrypted_line + '\n')
 
         print(f"\nOperation completed. File save as '{output_file}'")
@@ -238,7 +240,7 @@ class CaesarCipherAnalyzer:
             print(f"{row_string}")
 
     def letter_frequency(self):
-        text = self.readfile('Please enter the file to analyze: ')
+        text = self.readfile(input('Please enter the file to analyze: '))
         rows = 28
         cols = 56
         array = [[' ' for _ in range(cols)] for _ in range(rows)]
@@ -299,25 +301,24 @@ class CaesarCipherAnalyzer:
 # 4.)
 
     def infer_key(self):
-        encrypted_text = self.readfile('Please enter the file to analyze: ')
-        master_frequency = self.master_freq_dict(self.readfile(
-            '\nPlease enter the reference frequencies file: '))
+        encrypted_text = self.readfile(
+            input('Please enter the file to analyze: '))
+        master_frequency = self.master_freq_dict(self.readfile(input(
+            '\nPlease enter the reference frequencies file: ')))
         best_shift = self.best_caesar_shift(encrypted_text, master_frequency)
 
         print(f"The inferred caesar cipher shift is: {best_shift}")
         if (input('Would you like to decrypt this file using this key? y/n: ').lower() == 'y'):
             output_file = input('\nPlease enter a output file: ')
-            with open(output_file, 'w') as output:
-                output.write(self.decrypt_key(encrypted_text, best_shift))
-
-
+            self.writefile(self.decrypt_key(
+                encrypted_text, best_shift), output_file)
 ########################################################################################################################################################
 # 5.)
 
     def sort_file(self):
         folder_name = input("Please enter the folder name: ")
         # Replace with your master frequency dictionary
-        master_freq_dict = self.master_freq_dict(self.readfile("fict "))
+        master_freq_dict = self.master_freq_dict(self.readfile(input("fict ")))
         # Get a list of files in the specified folder
         files = [file for file in os.listdir(
             folder_name) if os.path.isfile(os.path.join(folder_name, file))]
@@ -348,14 +349,12 @@ class CaesarCipherAnalyzer:
         # Create and write the arranged files
         for i, (file_name, best_shift, decrypted_text) in enumerate(file_shift_pairs):
             # Generate the new file name as per your specified format
-            new_file_name = os.path.join('decrypted', f'file{i + 1}.txt')
+            output_file = os.path.join('decrypted', f'file{i + 1}.txt')
 
-            # Write the decrypted text to the new file
-            with open(new_file_name, 'w') as new_file:
-                new_file.write(decrypted_text)
+            self.writefile(decrypted_text, output_file)
 
             print(
-                f"Decrypting: {file_name} with key: {best_shift} as: {new_file_name}")
+                f"Decrypting: {file_name} with key: {best_shift} as: {output_file}")
         print("Files are stored in <decrypted> folder")
 
 
