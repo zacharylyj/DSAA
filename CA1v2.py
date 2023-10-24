@@ -52,6 +52,7 @@ class CaesarCipherAnalyzer:
             self.menu()
 ########################################################################################################################################################
 # global.)
+
     def readfile(self, input_message):
         input_file_name = input(input_message)
         with open(input_file_name, 'r') as input_file:
@@ -76,8 +77,10 @@ class CaesarCipherAnalyzer:
 
     def calculate_letter_frequencies(self, text):
         text = text.lower()
-        total_letters = sum(text.count(letter) for letter in string.ascii_lowercase)
-        letter_frequencies = {letter: text.count(letter) / total_letters for letter in string.ascii_lowercase}
+        total_letters = sum(text.count(letter)
+                            for letter in string.ascii_lowercase)
+        letter_frequencies = {letter: text.count(
+            letter) / total_letters for letter in string.ascii_lowercase}
         return letter_frequencies
 
     def find_best_shift(self, input_freq_dict, master_freq_dict):
@@ -87,10 +90,13 @@ class CaesarCipherAnalyzer:
         for shift in range(26):
             shifted_dict = {}
             for letter, freq in input_freq_dict.items():
-                shifted_letter = chr(((ord(letter) - ord('a') + shift) % 26) + ord('a'))
-                shifted_dict[shifted_letter] = shifted_dict.get(shifted_letter, 0) + freq
+                shifted_letter = chr(
+                    ((ord(letter) - ord('a') + shift) % 26) + ord('a'))
+                shifted_dict[shifted_letter] = shifted_dict.get(
+                    shifted_letter, 0) + freq
 
-            difference = sum(abs(master_freq_dict[letter] - shifted_dict.get(letter, 0)) for letter in string.ascii_lowercase)
+            difference = sum(abs(
+                master_freq_dict[letter] - shifted_dict.get(letter, 0)) for letter in string.ascii_lowercase)
             if difference < min_difference:
                 min_difference = difference
                 best_shift = shift
@@ -101,7 +107,6 @@ class CaesarCipherAnalyzer:
         letter_frequencies = self.calculate_letter_frequencies(encrypted_text)
         best_shift = self.find_best_shift(letter_frequencies, master_freq_dict)
         return best_shift
-
 
     def input_freq_dict(self, string):
         input_freq_dict = {}
@@ -114,7 +119,6 @@ class CaesarCipherAnalyzer:
                 input_freq_dict[key] = value
         return input_freq_dict
 
-        
     def shift_letter(self, letter, shift):
         if letter.isalpha():
             shifted_code = ord(letter) - shift
@@ -159,10 +163,11 @@ class CaesarCipherAnalyzer:
         best_chi_squared = float('inf')
 
         for shift in range(26):
-            shifted_text = ''.join([self.shift_letter(letter, shift) for letter in encrypted_text.lower()])
-            text_freq = {letter: shifted_text.count(letter) / len(shifted_text) for letter in string.ascii_lowercase}
+            shifted_text = ''.join([self.shift_letter(letter, shift)
+                                   for letter in encrypted_text.lower()])
+            text_freq = self.calculate_letter_frequencies(shifted_text)
             chi_squared = self.calculate_chi_squared(text_freq, master_freq)
-            
+
             if chi_squared < best_chi_squared:
                 best_chi_squared = chi_squared
                 best_shift = shift
@@ -224,6 +229,7 @@ class CaesarCipherAnalyzer:
         self.menu()
 ########################################################################################################################################################
 # 3.)
+
     def display_gui(self, array):
         for row in array:
             row_string = ''
@@ -291,9 +297,11 @@ class CaesarCipherAnalyzer:
         self.menu()
 ########################################################################################################################################################
 # 4.)
+
     def infer_key(self):
         encrypted_text = self.readfile('Please enter the file to analyze: ')
-        master_frequency = self.master_freq_dict(self.readfile('\nPlease enter the reference frequencies file: '))
+        master_frequency = self.master_freq_dict(self.readfile(
+            '\nPlease enter the reference frequencies file: '))
         best_shift = self.best_caesar_shift(encrypted_text, master_frequency)
 
         print(f"The inferred caesar cipher shift is: {best_shift}")
@@ -301,47 +309,56 @@ class CaesarCipherAnalyzer:
             output_file = input('\nPlease enter a output file: ')
             with open(output_file, 'w') as output:
                 output.write(self.decrypt_key(encrypted_text, best_shift))
-                
+
 
 ########################################################################################################################################################
-# 5.)       
+# 5.)
+
     def sort_file(self):
-        
-        folder_path = 'test'
+        folder_name = input("Please enter the folder name: ")
+        # Replace with your master frequency dictionary
+        master_freq_dict = self.master_freq_dict(self.readfile("fict "))
+        # Get a list of files in the specified folder
+        files = [file for file in os.listdir(
+            folder_name) if os.path.isfile(os.path.join(folder_name, file))]
 
-        master_freq_dict(readfile("master"))
+        # Create a list to store file names and their corresponding Caesar shift values
+        file_shift_pairs = []
 
-        # Create a list to store information about each encrypted message
-        message_info = []
+        # Process each file in the folder
+        for file_name in files:
+            # Read the contents of the file
+            file_path = os.path.join(folder_name, file_name)
+            with open(file_path, 'r') as file:
+                encrypted_text = file.read()
 
-        # Loop through the files in the folder
-        for filename in os.listdir(folder_path):
-            if filename.endswith('.txt'):  # Change the file extension as needed
-                file_path = os.path.join(folder_path, filename)
-                encrypted_text = readfile(f"Reading {filename}... ")
-                
-                # Find the best Caesar shift for decryption
-                best_shift = best_caesar_shift(encrypted_text, master_freq)
-                
-                # Decrypt the message
-                decrypted_message = decrypt_key(encrypted_text, best_shift)
-                
-                # Save the decrypted message to a file
-                output_filename = f"file{len(message_info) + 1}.txt"
-                with open(output_filename, 'w') as output_file:
-                    output_file.write(decrypted_message)
-                
-                # Store information about the message for sorting
-                message_info.append((filename, best_shift))
+            # Find the best Caesar shift for the file
+            best_shift = self.best_caesar_shift(
+                encrypted_text, master_freq_dict)
 
-        # Sort the messages based on the best_shift
-        message_info.sort(key=lambda x: x[1])
+            # Decrypt the file using the best shift
+            decrypted_text = self.decrypt_key(encrypted_text, best_shift)
 
-        # Print the sorted list of filenames and best shifts
-        for index, (filename, best_shift) in enumerate(message_info, start=1):
-            print(f"{index}. {filename}: Best Shift = {best_shift}")
+            # Append the file name and shift value to the list
+            file_shift_pairs.append((file_name, best_shift, decrypted_text))
 
-        print("Decryption complete.")
+        # Sort the list based on the Caesar shift values
+        file_shift_pairs.sort(key=lambda x: x[1])
+
+        # Create and write the arranged files
+        for i, (file_name, best_shift, decrypted_text) in enumerate(file_shift_pairs):
+            # Generate the new file name as per your specified format
+            new_file_name = os.path.join('decrypted', f'file{i + 1}.txt')
+
+            # Write the decrypted text to the new file
+            with open(new_file_name, 'w') as new_file:
+                new_file.write(decrypted_text)
+
+            print(
+                f"Decrypting: {file_name} with key: {best_shift} as: {new_file_name}")
+        print("Files are stored in <decrypted> folder")
+
+
 ########################################################################################################################################################
 if __name__ == "__main__":
     caesar_cipher_analyzer = CaesarCipherAnalyzer()
