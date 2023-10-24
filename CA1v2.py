@@ -3,6 +3,39 @@ import collections
 import os
 
 
+class Menu:
+    def __init__(self):
+        self.options = []
+
+    def add(self, redirect, value, message):
+        self.options.append((redirect, value, message))
+
+    def print_menu(self):
+        valid_choices = ",".join(str(i)
+                                 for i in range(1, len(self.options) + 1))
+        printmenu = f'Please select your choice: ({valid_choices})\n\t'
+        for option in self.options:
+            _, value, message = option
+            printmenu += f"{value}. {message}\n\t"
+        print(printmenu)
+
+    def select_option(self):
+        self.print_menu()
+        choice = input("Enter the number of your choice: ")
+        try:
+            choice = int(choice)
+            if 1 <= choice <= len(self.options):
+                redirect, value, _ = self.options[choice - 1]
+                if callable(redirect):
+                    redirect(value)
+                else:
+                    print(f"Function not callable: {redirect}")
+            else:
+                print("Invalid choice. Please select a valid option.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+
 class CaesarCipherAnalyzer:
     def __init__(self):
         self.width = 60
@@ -49,10 +82,14 @@ class CaesarCipherAnalyzer:
             print(
                 'Bye, thanks for using ST1507 DSAA: Caesar Cipher Encrypted Message Analyzer')
         else:
+            print(
+                'Not Valid Option: Try Again')
             self.menu()
 ########################################################################################################################################################
 # global.)
 
+
+class Global:
     def writefile(self, content, output_file_name):
         with open(output_file_name, 'w') as output_file:
             output_file.write(content)
@@ -358,7 +395,14 @@ class CaesarCipherAnalyzer:
         print("Files are stored in <decrypted> folder")
 
 
-########################################################################################################################################################
+def main():
+    menu = Menu()
+    global_ = Global()
+
+    menu.add(global_.encrypt_decrypt_message(), 1, "Encrypt/Decrypt Message")
+    menu.add(global_.encrypt_decrypt_file(), 2, "Encrypt/Decrypt Message")
+    menu.select_option()
+
+
 if __name__ == "__main__":
-    caesar_cipher_analyzer = CaesarCipherAnalyzer()
-    caesar_cipher_analyzer.intro()
+    main()
