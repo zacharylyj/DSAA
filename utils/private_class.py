@@ -83,17 +83,6 @@ class Private:
         else:
             return letter
 
-    def input_freq_dict(self, string):
-        input_freq_dict = {}
-        lines = string.split("\n")
-        for line in lines:
-            if line:
-                key, value = line.split(",")
-                key = key.strip()
-                value = float(value)
-                input_freq_dict[key] = value
-        return input_freq_dict
-
     def master_freq_dict(self, string):
         master_freq_dict = {}
         lines = string.split("\n")
