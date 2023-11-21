@@ -17,7 +17,7 @@ class Menu:
             f"*{' ' * round((self.width-len(text)-2)/2)}{text}{' ' * (self.width - (round((self.width-len(text)-2)/2)+len(text))-2)}*"
         )
         print(f"*{'-' * (self.width-2)}*")
-        text = f"    - Done by: {self.author_name}('{self.author_id}')"
+        text = f"    - Done by: {self.author_name}({self.author_id})"
         print(f"*{text}{' ' * (self.width-len(text)-2)}*")
         print(f"*{' ' * (self.width-2)}*")
         text = f"    - Class {self.author_class}"

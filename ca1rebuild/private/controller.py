@@ -10,7 +10,7 @@ class Controller:
     def __init__(self):
         self.cipher = Cipher()
         self.freqanalysis = FrequencyAnalysis()
-        self.file = FileOperator
+        self.file = FileOperator()
         self.utils = Utility()
         self.menu = Menu()
 
@@ -129,15 +129,11 @@ class Controller:
     # 4.)
 
     def infer_key(self):
-        encrypted_text = self.privateclass.readfile(
-            input("Please enter the file to analyze: ")
+        encrypted_text = self.file.readfile(input("Please enter the file to analyze: "))
+        master_frequency = self.utils.master_freq_dict(
+            self.file.readfile(input("\nPlease enter the reference frequencies file: "))
         )
-        master_frequency = self.privateclass.master_freq_dict(
-            self.privateclass.readfile(
-                input("\nPlease enter the reference frequencies file: ")
-            )
-        )
-        best_shift = self.privateclass.best_caesar_shift(
+        best_shift = self.freqanalysis.best_caesar_shift(
             encrypted_text, master_frequency
         )
 
@@ -147,8 +143,8 @@ class Controller:
             == "y"
         ):
             output_file = input("\nPlease enter a output file: ")
-            self.privateclass.writefile(
-                self.privateclass.decrypt_key(encrypted_text, best_shift), output_file
+            self.file.writefile(
+                self.cipher.decrypt_key(encrypted_text, best_shift), output_file
             )
         self.menu.select_option()
 
@@ -158,8 +154,8 @@ class Controller:
     def sort_file(self):
         folder_name = input("Please enter the folder name: ")
         # Replace with your master frequency dictionary
-        master_freq_dict = self.privateclass.master_freq_dict(
-            self.privateclass.readfile(input("fict "))
+        master_freq_dict = self.utils.master_freq_dict(
+            self.file.readfile(input("fict "))
         )
         # Get a list of files in the specified folder
         files = [
@@ -179,12 +175,12 @@ class Controller:
                 encrypted_text = file.read()
 
             # Find the best Caesar shift for the file
-            best_shift = self.privateclass.best_caesar_shift(
+            best_shift = self.freqanalysis.best_caesar_shift(
                 encrypted_text, master_freq_dict
             )
 
             # Decrypt the file using the best shift
-            decrypted_text = self.privateclass.decrypt_key(encrypted_text, best_shift)
+            decrypted_text = self.cipher.decrypt_key(encrypted_text, best_shift)
 
             # Append the file name and shift value to the list
             file_shift_pairs.append((file_name, best_shift, decrypted_text))
@@ -197,7 +193,7 @@ class Controller:
             # Generate the new file name as per your specified format
             output_file = os.path.join("decrypted", f"file{i + 1}.txt")
 
-            self.privateclass.writefile(decrypted_text, output_file)
+            self.file.writefile(decrypted_text, output_file)
 
             print(f"Decrypting: {file_name} with key: {best_shift} as: {output_file}")
         print("Files are stored in <decrypted> folder")
