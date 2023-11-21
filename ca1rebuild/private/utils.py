@@ -77,3 +77,72 @@ class Utility:
                         f"Terminal is requesting for matching Private Key\n[Public_Key: {self.hash_password}]"
                     )
                 self.pwcheck(counter)
+
+    def sort_linked_list(self, head):
+        if not head or not head.nextNode:
+            return head
+
+        # Split the list into two halves
+        middle = self.get_middle(head)
+        next_to_middle = middle.nextNode
+        middle.nextNode = None
+
+        # Sort each half
+        left = self.sort_linked_list(head)
+        right = self.sort_linked_list(next_to_middle)
+
+        # Merge the sorted halves
+        sorted_list = self.sorted_merge(left, right)
+        return sorted_list
+
+    def get_middle(self, head):
+        if head is None:
+            return head
+
+        slow = head
+        fast = head.nextNode
+
+        # Move fast by two and slow by one
+        while fast:
+            fast = fast.nextNode
+            if fast:
+                fast = fast.nextNode
+                slow = slow.nextNode
+
+        return slow
+
+    def sorted_merge(self, a, b):
+        result = None
+
+        # Base cases
+        if a is None:
+            return b
+        elif b is None:
+            return a
+
+        # Pick either a or b and recur
+        if a.best_shift < b.best_shift:
+            result = a
+            result.nextNode = self.sorted_merge(a.nextNode, b)
+        else:
+            result = b
+            result.nextNode = self.sorted_merge(a, b.nextNode)
+
+        return result
+
+
+class Node:
+    def __init__(
+        self, file_name=None, best_shift=None, decrypted_text=None, nextNode=None
+    ):
+        self.file_name = file_name
+        self.best_shift = best_shift
+        self.decrypted_text = decrypted_text
+        self.nextNode = nextNode
+
+    def __lt__(self, otherNode):
+        if otherNode == None:
+            raise TypeError(
+                "'<' not supported between instances of 'Node' and 'NoneType'"
+            )
+        return self.best_shift < otherNode.best_shift

@@ -1,5 +1,5 @@
 from private.ciphertools import Ceaser, FrequencyAnalysis, Sha
-from private.utils import FileOperator, Utility
+from private.utils import FileOperator, Utility, Node
 from private.menu import Menu
 import os
 
@@ -14,6 +14,7 @@ class Controller:
         self.utils = Utility("pang")
         self.menu = Menu()
         self.sha = Sha()
+        self.node = Node()
 
     def encrypt_decrypt_message(self):
         option = input("Enter 'E' for Encrypt or 'D' for Decrypt: ").upper()
@@ -153,7 +154,6 @@ class Controller:
     def sort_file(self):
         printstr = ""
         folder_name = input("Please enter the folder name: ")
-        # Replace with master freq
         master_freq_dict = self.utils.master_freq_dict(
             self.file.readfile(input("Please enter the frequency file: "))
         )
@@ -162,9 +162,12 @@ class Controller:
             for file in os.listdir(folder_name)
             if os.path.isfile(os.path.join(folder_name, file))
         ]
-        file_shift_pairs = []
+
+        # Create the head of the linked list
+        head = None
+        last_node = None
+
         for file_name in files:
-            # Read the content
             file_path = os.path.join(folder_name, file_name)
             with open(file_path, "r") as file:
                 encrypted_text = file.read()
@@ -172,26 +175,34 @@ class Controller:
             best_shift = self.freqanalysis.best_caesar_shift(
                 encrypted_text, master_freq_dict
             )
-
             decrypted_text = self.ceaser.decrypt_key(encrypted_text, best_shift)
 
-            file_shift_pairs.append((file_name, best_shift, decrypted_text))
+            # linked list intilise
+            if not head:
+                head = Node(file_name, best_shift, decrypted_text)
+                last_node = head
+            else:
+                last_node.nextNode = Node(file_name, best_shift, decrypted_text)
+                last_node = last_node.nextNode
 
-        # Sort the list
-        file_shift_pairs.sort(key=lambda x: x[1])
+        # Sort ll
+        sorted_head = self.utils.sort_linked_list(head)
 
-        for i, (file_name, best_shift, decrypted_text) in enumerate(file_shift_pairs):
-            output_file = os.path.join(f"{folder_name}", f"file{i + 1}.txt")
+        # loop to get content
+        current = sorted_head
+        index = 0
+        while current:
+            output_file = os.path.join(folder_name, f"file{index + 1}.txt")
+            self.file.writefile(current.decrypted_text, output_file)
+            printstr += f"Decrypting: {current.file_name} with key: {current.best_shift} as: {output_file}\n"
 
-            self.file.writefile(decrypted_text, output_file)
+            current = current.nextNode
+            index += 1
 
-            printstr += (
-                f"Decrypting: {file_name} with key: {best_shift} as: {output_file}\n"
-            )
-        print(printstr)
-        log_file = os.path.join(f"{folder_name}", "log.txt")
+        log_file = os.path.join(folder_name, "log.txt")
         self.file.writefile(printstr, log_file)
         print(f"Files are stored in <{folder_name}> folder")
+        print(printstr)
         self.menu.select_option()
 
     def option1(self):

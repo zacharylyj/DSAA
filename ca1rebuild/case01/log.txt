@@ -1,1 +1,4 @@
-Decrypting: log.txt with key: 0 as: case01\file1.txtDecrypting: 3shift.txt with key: 3 as: case01\file2.txtDecrypting: shiftseven.txt with key: 7 as: case01\file3.txtDecrypting: shiftten.txt with key: 10 as: case01\file4.txtDecrypting: 25shift.txt with key: 25 as: case01\file5.txt
+Decrypting: 3shift.txt with key: 3 as: case01\file1.txt
+Decrypting: shiftseven.txt with key: 7 as: case01\file2.txt
+Decrypting: shiftten.txt with key: 10 as: case01\file3.txt
+Decrypting: 25shift.txt with key: 25 as: case01\file4.txt
