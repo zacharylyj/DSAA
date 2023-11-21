@@ -152,10 +152,11 @@ class Controller:
     # 5.)
 
     def sort_file(self):
+        printstr = ""
         folder_name = input("Please enter the folder name: ")
         # Replace with your master frequency dictionary
         master_freq_dict = self.utils.master_freq_dict(
-            self.file.readfile(input("fict "))
+            self.file.readfile(input("Please enter the frequency file: "))
         )
         # Get a list of files in the specified folder
         files = [
@@ -191,12 +192,17 @@ class Controller:
         # Create and write the arranged files
         for i, (file_name, best_shift, decrypted_text) in enumerate(file_shift_pairs):
             # Generate the new file name as per your specified format
-            output_file = os.path.join("decrypted", f"file{i + 1}.txt")
+            output_file = os.path.join(f"{folder_name}", f"file{i + 1}.txt")
 
             self.file.writefile(decrypted_text, output_file)
 
-            print(f"Decrypting: {file_name} with key: {best_shift} as: {output_file}")
-        print("Files are stored in <decrypted> folder")
+            printstr += (
+                f"Decrypting: {file_name} with key: {best_shift} as: {output_file}\n"
+            )
+        print(printstr)
+        log_file = os.path.join(f"{folder_name}", "log.txt")
+        self.file.writefile(printstr, log_file)
+        print(f"Files are stored in <{folder_name}> folder")
         self.menu.select_option()
 
     def option1(self):

@@ -32,16 +32,6 @@ class Cipher:
                 return encrypted_char if is_upper else encrypted_char.lower()
         return char
 
-    # for lower case no predefined
-    def shift_letter(self, letter, shift):
-        if letter.isalpha():
-            shifted_code = ord(letter) - shift
-            if shifted_code < ord("a"):
-                shifted_code += 26
-            return chr(shifted_code)
-        else:
-            return letter
-
 
 class FrequencyAnalysis:
     def calculate_letter_frequencies(self, text):
@@ -82,6 +72,16 @@ class FrequencyAnalysis:
             expected = master_freq[letter]
             chi_squared += ((observed - expected) ** 2) / expected
         return chi_squared
+
+    # for lower case no predefined
+    def shift_letter(self, letter, shift):
+        if letter.isalpha():
+            shifted_code = ord(letter) - shift
+            if shifted_code < ord("a"):
+                shifted_code += 26
+            return chr(shifted_code)
+        else:
+            return letter
 
     def best_caesar_shift(self, encrypted_text, master_freq):
         best_shift = None

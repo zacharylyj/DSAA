@@ -17,7 +17,10 @@ class FileOperator:
     def readfile(self, input_file_name):
         if not os.path.exists(input_file_name):
             print(f"File {input_file_name} not found. Please try again.")
-            self.menu.select_option()
+            reinput = input("Please re-input the file name: ")
+            if reinput.upper() == "Q":
+                self.menu.select_option()
+            return self.readfile(reinput)
 
         with open(input_file_name, "r") as input_file:
             return input_file.read()
