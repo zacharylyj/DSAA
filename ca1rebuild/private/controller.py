@@ -1,5 +1,5 @@
 from private.ciphertools import Ceaser, FrequencyAnalysis, Sha
-from private.utils import FileOperator, Utility, Node
+from private.utils import FileOperator, Utility, FileSortNode, FrequencyNode
 from private.menu import Menu
 import os
 
@@ -14,7 +14,6 @@ class Controller:
         self.utils = Utility("password")
         self.menu = Menu()
         self.sha = Sha()
-        self.node = Node()
 
     def encrypt_decrypt_message(self):
         option = input("Enter 'E' for Encrypt or 'D' for Decrypt: ").upper()
@@ -75,52 +74,69 @@ class Controller:
         rows = 28
         cols = 56
         array = [[" " for _ in range(cols)] for _ in range(rows)]
-        # A-Z
+
+        # Initialize the ASCII representation
         for i in range(65, 91):
             array[rows - 1][((i - 64) * 2) - 1] = chr(i)
-        # _
         for i in range(0, 53):
             array[rows - 2][i] = "_"
-        # ACSII for capital A to Z
-        letter_counts = {chr(letter): 0 for letter in range(65, 91)}
 
+        # Count letters
+        letter_counts = {chr(letter): 0 for letter in range(65, 91)}
         text = text.upper()
         text_len = len("".join(text.split()))
         for char in text:
             if char.isalpha():
-                if char in letter_counts:
-                    letter_counts[char] += 1
-                else:
-                    letter_counts[char] = 1
+                letter_counts[char] += 1
 
+        # Create and populate the linked list
+        head = None
+        last_node = None
         for letter, count in letter_counts.items():
-            for i in range((rows - (round((count / text_len) * 26) + 2)), (rows - 2)):
+            new_node = FrequencyNode(letter, count)
+            if not head:
+                head = new_node
+                last_node = head
+            else:
+                last_node.nextNode = new_node
+                last_node = last_node.nextNode
+
+        # Sort the linked list
+        sorted_head = self.utils.sort_linked_list(head)
+
+        # Process the sorted linked list
+        current = sorted_head
+        while current:
+            letter = current.letter
+            count = current.frequency
+            percentage = ((count / text_len) * 100) if text_len > 0 else 0
+            perc_str = f"{percentage:.2f}%"
+            space = " " * (6 - len(perc_str))
+
+            # Fill in the frequency chart
+            for i in range((rows - (round(percentage * 0.26) + 2)), (rows - 2)):
                 array[i][((ord(letter) - 64) * 2) - 1] = "*"
+            array[(ord(letter) - 65)][54] = f"{letter}-{space}{perc_str}"
 
-        for i in range(0, rows - 1):
-            array[i][53] = "| "
+            current = current.nextNode
 
-        for letter, count in letter_counts.items():
-            percentage = f"{((count / text_len) * 100):.2f}%"
-            space = " " * (6 - (len(f"{percentage}")))
-            array[(ord(letter) - 65)][54] = f"{letter}-{space}{percentage}"
-
-        # right legend
+        # Right legend for top 5 frequencies
         array[10][55] = " \tTOP 5 FREQ"
         array[11][55] = " \t----------"
-        sorted_letter_counts = sorted(
-            letter_counts.items(), key=lambda item: item[1], reverse=True
-        )
+        current = sorted_head
+        for i in range(5):
+            if current:
+                letter = current.letter
+                count = current.frequency
+                percentage = ((count / text_len) * 100) if text_len > 0 else 0
+                perc_str = f"{percentage:.2f}%"
+                space = " " * (6 - len(perc_str))
+                array[(i + 12)][55] = f" \t| {letter}-{space}{perc_str}"
+                current = current.nextNode
 
-        top_5 = []
-
-        for letter, count in sorted_letter_counts[:5]:
-            percentage = f"{((count / text_len) * 100):.2f}%"
-            top_5.append((letter, percentage))
-
-        for i, (letter, percentage) in enumerate(top_5, 1):
-            space = " " * (6 - (len(f"{percentage}")))
-            array[(i + 11)][55] = f" \t| {letter}-{space}{percentage}"
+        # Final array processing
+        for i in range(0, rows - 1):
+            array[i][53] = "| "
 
         self.utils.display_gui(array)
         self.menu.select_option()
@@ -179,10 +195,10 @@ class Controller:
 
             # linked list intilise
             if not head:
-                head = Node(file_name, best_shift, decrypted_text)
+                head = FileSortNode(file_name, best_shift, decrypted_text)
                 last_node = head
             else:
-                last_node.nextNode = Node(file_name, best_shift, decrypted_text)
+                last_node.nextNode = FileSortNode(file_name, best_shift, decrypted_text)
                 last_node = last_node.nextNode
 
         # Sort ll

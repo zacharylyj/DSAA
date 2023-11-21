@@ -120,8 +120,8 @@ class Utility:
         elif b is None:
             return a
 
-        # Pick either a or b and recur
-        if a.best_shift < b.best_shift:
+        # Pick either a or b and recur using get_comp_key
+        if a.get_comp_key() < b.get_comp_key():
             result = a
             result.nextNode = self.sorted_merge(a.nextNode, b)
         else:
@@ -131,7 +131,20 @@ class Utility:
         return result
 
 
-class Node:
+class FrequencyNode:
+    def __init__(self, letter=None, frequency=0, nextNode=None):
+        self.letter = letter
+        self.frequency = frequency
+        self.nextNode = nextNode
+
+    def get_comp_key(self):
+        return self.frequency
+
+    def __lt__(self, other):
+        return self.get_comp_key() < other.get_comp_key()
+
+
+class FileSortNode:
     def __init__(
         self, file_name=None, best_shift=None, decrypted_text=None, nextNode=None
     ):
@@ -140,15 +153,8 @@ class Node:
         self.decrypted_text = decrypted_text
         self.nextNode = nextNode
 
+    def get_comp_key(self):
+        return self.best_shift
+
     def __lt__(self, otherNode):
-        return self.best_shift < otherNode.best_shift
-
-
-class FrequencyNode:
-    def __init__(self, letter=None, frequency=0, nextNode=None):
-        self.letter = letter
-        self.frequency = frequency
-        self.nextNode = nextNode
-
-    def __lt__(self, other):
-        return self.frequency < other.frequency
+        return self.get_comp_key() < otherNode.get_comp_key()
