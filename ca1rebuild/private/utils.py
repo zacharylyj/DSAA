@@ -141,8 +141,14 @@ class Node:
         self.nextNode = nextNode
 
     def __lt__(self, otherNode):
-        if otherNode == None:
-            raise TypeError(
-                "'<' not supported between instances of 'Node' and 'NoneType'"
-            )
         return self.best_shift < otherNode.best_shift
+
+
+class FrequencyNode:
+    def __init__(self, letter=None, frequency=0, nextNode=None):
+        self.letter = letter
+        self.frequency = frequency
+        self.nextNode = nextNode
+
+    def __lt__(self, other):
+        return self.frequency < other.frequency

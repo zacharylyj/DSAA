@@ -11,7 +11,7 @@ class Controller:
         self.ceaser = Ceaser()
         self.freqanalysis = FrequencyAnalysis()
         self.file = FileOperator()
-        self.utils = Utility("pang")
+        self.utils = Utility("password")
         self.menu = Menu()
         self.sha = Sha()
         self.node = Node()
