@@ -32,13 +32,14 @@ class Ceaser:
                 return encrypted_char if is_upper else encrypted_char.lower()
         return char
 
+
 # https://en.wikipedia.org/wiki/SHA-1
 class Sha:
     def _left_rotate(self, n, b):
         return ((n << b) | (n >> (32 - b))) & 0xFFFFFFFF
 
     def hash(self, pkey):
-        # init the set values of h0-h4
+        # init the set values of h0-h4 used by previous dev
         h0 = 0x67452301
         h1 = 0xEFCDAB89
         h2 = 0x98BADCFE
@@ -97,9 +98,9 @@ class Sha:
         # conver to hex
         return "%08x%08x%08x%08x%08x" % (h0, h1, h2, h3, h4)
 
-
     def check(self, private, public):
         return self.hash(private) == public
+
 
 class FrequencyAnalysis:
     def calculate_letter_frequencies(self, text):

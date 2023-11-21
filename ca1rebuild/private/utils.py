@@ -32,7 +32,6 @@ class Utility:
         self.sha = Sha()
         self.menu = Menu()
         self.hash_password = self.sha.hash(password)
-        
 
     def input_freq_dict(self, string):
         input_freq_dict = {}
@@ -73,7 +72,8 @@ class Utility:
                 return
             else:
                 print("Private Key incorrect")
-                if counter > 3: print(f"Terminal is requesting for matching Private Key\n[Public_Key: {self.hash_password}]")
+                if counter > 3:
+                    print(
+                        f"Terminal is requesting for matching Private Key\n[Public_Key: {self.hash_password}]"
+                    )
                 self.pwcheck(counter)
-
-        

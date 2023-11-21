@@ -11,7 +11,7 @@ class Controller:
         self.ceaser = Ceaser()
         self.freqanalysis = FrequencyAnalysis()
         self.file = FileOperator()
-        self.utils = Utility('pang')
+        self.utils = Utility("pang")
         self.menu = Menu()
         self.sha = Sha()
 
@@ -153,44 +153,34 @@ class Controller:
     def sort_file(self):
         printstr = ""
         folder_name = input("Please enter the folder name: ")
-        # Replace with your master frequency dictionary
+        # Replace with master freq
         master_freq_dict = self.utils.master_freq_dict(
             self.file.readfile(input("Please enter the frequency file: "))
         )
-        # Get a list of files in the specified folder
         files = [
             file
             for file in os.listdir(folder_name)
             if os.path.isfile(os.path.join(folder_name, file))
         ]
-
-        # Create a list to store file names and their corresponding Caesar shift values
         file_shift_pairs = []
-
-        # Process each file in the folder
         for file_name in files:
-            # Read the contents of the file
+            # Read the content
             file_path = os.path.join(folder_name, file_name)
             with open(file_path, "r") as file:
                 encrypted_text = file.read()
 
-            # Find the best Caesar shift for the file
             best_shift = self.freqanalysis.best_caesar_shift(
                 encrypted_text, master_freq_dict
             )
 
-            # Decrypt the file using the best shift
             decrypted_text = self.ceaser.decrypt_key(encrypted_text, best_shift)
 
-            # Append the file name and shift value to the list
             file_shift_pairs.append((file_name, best_shift, decrypted_text))
 
-        # Sort the list based on the Caesar shift values
+        # Sort the list
         file_shift_pairs.sort(key=lambda x: x[1])
 
-        # Create and write the arranged files
         for i, (file_name, best_shift, decrypted_text) in enumerate(file_shift_pairs):
-            # Generate the new file name as per your specified format
             output_file = os.path.join(f"{folder_name}", f"file{i + 1}.txt")
 
             self.file.writefile(decrypted_text, output_file)
@@ -205,14 +195,20 @@ class Controller:
         self.menu.select_option()
 
     def option1(self):
-        option = input("Enter 'E' for Encrypt or 'C' to Check if Private Key is verified: ").upper()
+        option = input(
+            "Enter 'E' for Encrypt or 'C' to Check if Private Key is verified: "
+        ).upper()
         if option == "E":
-            public_key = self.sha.hash(input("Enter and Remember the Private Key(password): "))
+            public_key = self.sha.hash(
+                input("Enter and Remember the Private Key(password): ")
+            )
             print(f"Your Public Key is: {public_key}")
             self.file.writefile(public_key, "Public_Key.txt")
-            print(f"Saved in <Public_Key.txt>")
+            print("Saved in <Public_Key.txt>")
         elif option == "C":
-            if self.sha.check(input("Enter the Private Key: "), input("Enter the Public Key: ")):
+            if self.sha.check(
+                input("Enter the Private Key: "), input("Enter the Public Key: ")
+            ):
                 print("Private Key is Verified ✔")
             else:
                 print("Private Key is does not match ✘")
