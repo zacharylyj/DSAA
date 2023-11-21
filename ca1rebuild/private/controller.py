@@ -1,4 +1,4 @@
-from private.ciphertools import Cipher, FrequencyAnalysis
+from private.ciphertools import Ceaser, FrequencyAnalysis, Sha
 from private.utils import FileOperator, Utility
 from private.menu import Menu
 import os
@@ -8,11 +8,12 @@ class Controller:
     ########################################################################################################################################################
     # 1.)
     def __init__(self):
-        self.cipher = Cipher()
+        self.ceaser = Ceaser()
         self.freqanalysis = FrequencyAnalysis()
         self.file = FileOperator()
         self.utils = Utility()
         self.menu = Menu()
+        self.sha = Sha()
 
     def encrypt_decrypt_message(self):
         option = input("Enter 'E' for Encrypt or 'D' for Decrypt: ").upper()
@@ -20,13 +21,13 @@ class Controller:
             text = str(input("\nPlease type text you want to encrypt:\n"))
             key = int(input("\nEnter the cipher key: "))
             print(f"\nPlaintext:      {text}")
-            print(f"Ciphertext:     {self.cipher.encrypt_key(text, key)}\n")
+            print(f"Ciphertext:     {self.ceaser.encrypt_key(text, key)}\n")
             self.menu.select_option()
         elif option == "D":
             cipher = str(input("\nPlease type text you want to decrypt:\n"))
             key = int(input("\nEnter the cipher key: "))
             print(f"\nCiphertext:     {cipher}")
-            print(f"Plaintext:      {self.cipher.decrypt_key(cipher, key)}\n")
+            print(f"Plaintext:      {self.ceaser.decrypt_key(cipher, key)}\n")
             self.menu.select_option()
         elif option == "Q":
             self.menu.select_option()
@@ -55,9 +56,9 @@ class Controller:
         with open(input_file, "r") as input_file, open(output_file, "w") as output:
             for line in input_file:
                 if option == "E":
-                    encrypted_line = self.cipher.encrypt_key(line, key)
+                    encrypted_line = self.ceaser.encrypt_key(line, key)
                 elif option == "D":
-                    encrypted_line = self.cipher.decrypt_key(line, key)
+                    encrypted_line = self.ceaser.decrypt_key(line, key)
                 else:
                     print("Try Again")
                 output.write(encrypted_line + "\n")
@@ -144,7 +145,7 @@ class Controller:
         ):
             output_file = input("\nPlease enter a output file: ")
             self.file.writefile(
-                self.cipher.decrypt_key(encrypted_text, best_shift), output_file
+                self.ceaser.decrypt_key(encrypted_text, best_shift), output_file
             )
         self.menu.select_option()
 
@@ -181,7 +182,7 @@ class Controller:
             )
 
             # Decrypt the file using the best shift
-            decrypted_text = self.cipher.decrypt_key(encrypted_text, best_shift)
+            decrypted_text = self.ceaser.decrypt_key(encrypted_text, best_shift)
 
             # Append the file name and shift value to the list
             file_shift_pairs.append((file_name, best_shift, decrypted_text))
@@ -206,6 +207,10 @@ class Controller:
         self.menu.select_option()
 
     def option1(self):
+        self.sha.load("Hello, pookie!")
+        print(f"SHA-1 Hashd: {self.sha.combine()}")
+        print(f"SHA-1 Hash: {self.sha.hexcombine()}")
+
         self.menu.select_option()
 
     def option2(self):

@@ -14,7 +14,6 @@ def main():
     menu.add(controller.option1, 6, "Extra Option One")
     menu.add(controller.option2, 7, "Extra Option Two")
     menu.add(menu.exit_menu, 8, "Exit")
-
     menu.intro()
 
 

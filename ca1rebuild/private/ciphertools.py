@@ -1,7 +1,7 @@
 import string
 
 
-class Cipher:
+class Ceaser:
     def __init__(self):
         self.frequency_analysis = FrequencyAnalysis()
 
@@ -31,6 +31,81 @@ class Cipher:
                 encrypted_char = alphabet[index]
                 return encrypted_char if is_upper else encrypted_char.lower()
         return char
+
+
+class Sha:
+    def __init__(self):
+        self.h0 = 0x67452301
+        self.h1 = 0xEFCDAB89
+        self.h2 = 0x98BADCFE
+        self.h3 = 0x10325476
+        self.h4 = 0xC3D2E1F0
+
+    def _left_rotate(self, n, b):
+        return ((n << b) | (n >> (32 - b))) & 0xFFFFFFFF
+
+    def load(self, message):
+        message = bytearray(message, "utf-8")
+        original_length_in_bits = (8 * len(message)) & 0xFFFFFFFFFFFFFFFF
+        message.append(0x80)
+
+        while len(message) % 64 != 56:
+            message.append(0)
+
+        message += original_length_in_bits.to_bytes(8, byteorder="big")
+
+        for chunk_start in range(0, len(message), 64):
+            chunk = message[chunk_start : chunk_start + 64]
+            w = [0] * 80
+            for i in range(16):
+                w[i] = int.from_bytes(chunk[i * 4 : i * 4 + 4], byteorder="big")
+            for i in range(16, 80):
+                w[i] = self._left_rotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1)
+
+            a = self.h0
+            b = self.h1
+            c = self.h2
+            d = self.h3
+            e = self.h4
+
+            for i in range(80):
+                if 0 <= i <= 19:
+                    f = (b & c) | ((~b) & d)
+                    k = 0x5A827999
+                elif 20 <= i <= 39:
+                    f = b ^ c ^ d
+                    k = 0x6ED9EBA1
+                elif 40 <= i <= 59:
+                    f = (b & c) | (b & d) | (c & d)
+                    k = 0x8F1BBCDC
+                elif 60 <= i <= 79:
+                    f = b ^ c ^ d
+                    k = 0xCA62C1D6
+
+                temp = self._left_rotate(a, 5) + f + e + k + w[i] & 0xFFFFFFFF
+                e = d
+                d = c
+                c = self._left_rotate(b, 30)
+                b = a
+                a = temp
+
+            self.h0 = (self.h0 + a) & 0xFFFFFFFF
+            self.h1 = (self.h1 + b) & 0xFFFFFFFF
+            self.h2 = (self.h2 + c) & 0xFFFFFFFF
+            self.h3 = (self.h3 + d) & 0xFFFFFFFF
+            self.h4 = (self.h4 + e) & 0xFFFFFFFF
+
+    def combine(self):
+        return (
+            (self.h0 << 128)
+            | (self.h1 << 96)
+            | (self.h2 << 64)
+            | (self.h3 << 32)
+            | self.h4
+        )
+
+    def hexcombine(self):
+        return "%08x%08x%08x%08x%08x" % (self.h0, self.h1, self.h2, self.h3, self.h4)
 
 
 class FrequencyAnalysis:
