@@ -1,3 +1,4 @@
+from private.ciphertools import Sha
 from private.menu import Menu
 import os
 
@@ -27,6 +28,12 @@ class FileOperator:
 
 
 class Utility:
+    def __init__(self, password=str):
+        self.sha = Sha()
+        self.menu = Menu()
+        self.hash_password = self.sha.hash(password)
+        
+
     def input_freq_dict(self, string):
         input_freq_dict = {}
         lines = string.split("\n")
@@ -55,3 +62,18 @@ class Utility:
             for cell in row:
                 row_string += cell
             print(f"{row_string}")
+
+    def pwcheck(self, counter=0):
+        counter += 1
+        input_pw = input("Enter the Private Key: ")
+        if input_pw.upper() == "Q":
+            self.menu.select_option()
+        else:
+            if self.sha.check(input_pw, self.hash_password):
+                return
+            else:
+                print("Private Key incorrect")
+                if counter > 3: print(f"Terminal is requesting for matching Private Key\n[Public_Key: {self.hash_password}]")
+                self.pwcheck(counter)
+
+        

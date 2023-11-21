@@ -11,7 +11,7 @@ class Controller:
         self.ceaser = Ceaser()
         self.freqanalysis = FrequencyAnalysis()
         self.file = FileOperator()
-        self.utils = Utility()
+        self.utils = Utility('pang')
         self.menu = Menu()
         self.sha = Sha()
 
@@ -121,8 +121,6 @@ class Controller:
             space = " " * (6 - (len(f"{percentage}")))
             array[(i + 11)][55] = f" \t| {letter}-{space}{percentage}"
 
-        print(top_5)
-
         self.utils.display_gui(array)
         self.menu.select_option()
 
@@ -207,11 +205,24 @@ class Controller:
         self.menu.select_option()
 
     def option1(self):
-        self.sha.load("Hello, pookie!")
-        print(f"SHA-1 Hashd: {self.sha.combine()}")
-        print(f"SHA-1 Hash: {self.sha.hexcombine()}")
-
+        option = input("Enter 'E' for Encrypt or 'C' to Check if Private Key is verified: ").upper()
+        if option == "E":
+            public_key = self.sha.hash(input("Enter and Remember the Private Key(password): "))
+            print(f"Your Public Key is: {public_key}")
+            self.file.writefile(public_key, "Public_Key.txt")
+            print(f"Saved in <Public_Key.txt>")
+        elif option == "C":
+            if self.sha.check(input("Enter the Private Key: "), input("Enter the Public Key: ")):
+                print("Private Key is Verified ✔")
+            else:
+                print("Private Key is does not match ✘")
+        elif option == "Q":
+            self.menu.select_option()
+        else:
+            print("Try again")
         self.menu.select_option()
 
     def option2(self):
+        self.utils.pwcheck()
+        print("suck")
         self.menu.select_option()

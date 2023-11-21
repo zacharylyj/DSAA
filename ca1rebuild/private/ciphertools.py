@@ -32,41 +32,41 @@ class Ceaser:
                 return encrypted_char if is_upper else encrypted_char.lower()
         return char
 
-
+# https://en.wikipedia.org/wiki/SHA-1
 class Sha:
-    def __init__(self):
-        self.h0 = 0x67452301
-        self.h1 = 0xEFCDAB89
-        self.h2 = 0x98BADCFE
-        self.h3 = 0x10325476
-        self.h4 = 0xC3D2E1F0
-
     def _left_rotate(self, n, b):
         return ((n << b) | (n >> (32 - b))) & 0xFFFFFFFF
 
-    def load(self, message):
-        message = bytearray(message, "utf-8")
-        original_length_in_bits = (8 * len(message)) & 0xFFFFFFFFFFFFFFFF
-        message.append(0x80)
+    def hash(self, pkey):
+        # init the set values of h0-h4
+        h0 = 0x67452301
+        h1 = 0xEFCDAB89
+        h2 = 0x98BADCFE
+        h3 = 0x10325476
+        h4 = 0xC3D2E1F0
+        pkey = pkey.strip()
+        pkey = bytearray(pkey, "utf-8")
+        original_length_in_bits = (8 * len(pkey)) & 0xFFFFFFFFFFFFFFFF
+        pkey.append(0x80)
 
-        while len(message) % 64 != 56:
-            message.append(0)
+        while len(pkey) % 64 != 56:
+            pkey.append(0)
 
-        message += original_length_in_bits.to_bytes(8, byteorder="big")
+        pkey += original_length_in_bits.to_bytes(8, byteorder="big")
 
-        for chunk_start in range(0, len(message), 64):
-            chunk = message[chunk_start : chunk_start + 64]
+        for chunk_start in range(0, len(pkey), 64):
+            chunk = pkey[chunk_start : chunk_start + 64]
             w = [0] * 80
             for i in range(16):
                 w[i] = int.from_bytes(chunk[i * 4 : i * 4 + 4], byteorder="big")
             for i in range(16, 80):
                 w[i] = self._left_rotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1)
 
-            a = self.h0
-            b = self.h1
-            c = self.h2
-            d = self.h3
-            e = self.h4
+            a = h0
+            b = h1
+            c = h2
+            d = h3
+            e = h4
 
             for i in range(80):
                 if 0 <= i <= 19:
@@ -89,24 +89,17 @@ class Sha:
                 b = a
                 a = temp
 
-            self.h0 = (self.h0 + a) & 0xFFFFFFFF
-            self.h1 = (self.h1 + b) & 0xFFFFFFFF
-            self.h2 = (self.h2 + c) & 0xFFFFFFFF
-            self.h3 = (self.h3 + d) & 0xFFFFFFFF
-            self.h4 = (self.h4 + e) & 0xFFFFFFFF
+            h0 = (h0 + a) & 0xFFFFFFFF
+            h1 = (h1 + b) & 0xFFFFFFFF
+            h2 = (h2 + c) & 0xFFFFFFFF
+            h3 = (h3 + d) & 0xFFFFFFFF
+            h4 = (h4 + e) & 0xFFFFFFFF
+        # conver to hex
+        return "%08x%08x%08x%08x%08x" % (h0, h1, h2, h3, h4)
 
-    def combine(self):
-        return (
-            (self.h0 << 128)
-            | (self.h1 << 96)
-            | (self.h2 << 64)
-            | (self.h3 << 32)
-            | self.h4
-        )
 
-    def hexcombine(self):
-        return "%08x%08x%08x%08x%08x" % (self.h0, self.h1, self.h2, self.h3, self.h4)
-
+    def check(self, private, public):
+        return self.hash(private) == public
 
 class FrequencyAnalysis:
     def calculate_letter_frequencies(self, text):
