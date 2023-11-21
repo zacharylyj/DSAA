@@ -2,6 +2,7 @@ from private.ciphertools import Ceaser, FrequencyAnalysis, Sha
 from private.utils import FileOperator, Utility, FileSortNode, FrequencyNode
 from private.menu import Menu
 import os
+import math
 
 
 class Controller:
@@ -61,7 +62,7 @@ class Controller:
                     encrypted_line = self.ceaser.decrypt_key(line, key)
                 else:
                     print("Try Again")
-                output.write(encrypted_line + "\n")
+                output.write(encrypted_line)
 
         print(f"\nOperation completed. File save as '{output_file}'")
         self.menu.select_option()
@@ -104,8 +105,11 @@ class Controller:
         # Sort the linked list
         sorted_head = self.utils.sort_linked_list(head)
 
-        # Process the sorted linked list
-        current = sorted_head
+        # Reverse the sorted linked list to get it in descending order
+        reversed_head = self.utils.reverse_linked_list(sorted_head)
+
+        # Process the reversed linked list
+        current = reversed_head
         while current:
             letter = current.letter
             count = current.frequency
@@ -114,7 +118,7 @@ class Controller:
             space = " " * (6 - len(perc_str))
 
             # Fill in the frequency chart
-            for i in range((rows - (round(percentage * 0.26) + 2)), (rows - 2)):
+            for i in range((rows - (math.ceil(percentage * 0.26) + 2)), (rows - 2)):
                 array[i][((ord(letter) - 64) * 2) - 1] = "*"
             array[(ord(letter) - 65)][54] = f"{letter}-{space}{perc_str}"
 
@@ -123,7 +127,7 @@ class Controller:
         # Right legend for top 5 frequencies
         array[10][55] = " \tTOP 5 FREQ"
         array[11][55] = " \t----------"
-        current = sorted_head
+        current = reversed_head
         for i in range(5):
             if current:
                 letter = current.letter

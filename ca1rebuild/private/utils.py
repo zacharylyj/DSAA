@@ -95,6 +95,19 @@ class Utility:
         sorted_list = self.sorted_merge(left, right)
         return sorted_list
 
+    def reverse_linked_list(self, head):
+        previous_node = None
+        current_node = head
+        next_node = None
+
+        while current_node is not None:
+            next_node = current_node.nextNode  # THIS IS FOR Storing
+            current_node.nextNode = previous_node  # Reverse
+            previous_node = current_node
+            current_node = next_node
+
+        return previous_node
+
     def get_middle(self, head):
         if head is None:
             return head
