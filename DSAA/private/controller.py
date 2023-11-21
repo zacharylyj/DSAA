@@ -76,13 +76,13 @@ class Controller:
         cols = 56
         array = [[" " for _ in range(cols)] for _ in range(rows)]
 
-        # Initialize the ASCII representation
+        # convert asciic
         for i in range(65, 91):
             array[rows - 1][((i - 64) * 2) - 1] = chr(i)
         for i in range(0, 53):
             array[rows - 2][i] = "_"
 
-        # Count letters
+        # freq count
         letter_counts = {chr(letter): 0 for letter in range(65, 91)}
         text = text.upper()
         text_len = len("".join(text.split()))
@@ -90,7 +90,7 @@ class Controller:
             if char.isalpha():
                 letter_counts[char] += 1
 
-        # Create and populate the linked list
+        # init and populate ll
         head = None
         last_node = None
         for letter, count in letter_counts.items():
@@ -102,13 +102,12 @@ class Controller:
                 last_node.nextNode = new_node
                 last_node = last_node.nextNode
 
-        # Sort the linked list
+        # Sort ll
         sorted_head = self.utils.sort_linked_list(head)
 
-        # Reverse the sorted linked list to get it in descending order
+        # Reverse ll
         reversed_head = self.utils.reverse_linked_list(sorted_head)
 
-        # Process the reversed linked list
         current = reversed_head
         while current:
             letter = current.letter
@@ -117,14 +116,14 @@ class Controller:
             perc_str = f"{percentage:.2f}%"
             space = " " * (6 - len(perc_str))
 
-            # Fill in the frequency chart
+            # Fill in the freq 2d array
             for i in range((rows - (math.ceil(percentage * 0.26) + 2)), (rows - 2)):
                 array[i][((ord(letter) - 64) * 2) - 1] = "*"
             array[(ord(letter) - 65)][54] = f"{letter}-{space}{perc_str}"
 
             current = current.nextNode
 
-        # Right legend for top 5 frequencies
+        # Right legend for top 5 freq
         array[10][55] = " \tTOP 5 FREQ"
         array[11][55] = " \t----------"
         current = reversed_head
@@ -138,7 +137,7 @@ class Controller:
                 array[(i + 12)][55] = f" \t| {letter}-{space}{perc_str}"
                 current = current.nextNode
 
-        # Final array processing
+        # Wall
         for i in range(0, rows - 1):
             array[i][53] = "| "
 
