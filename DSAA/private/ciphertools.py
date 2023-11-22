@@ -236,9 +236,13 @@ class BookCipher:
             else:
                 try:
                     position = int(token)
-                    decrypted_message.append(words[position])
-                except ValueError:
-                    decrypted_message.append("?")  # Indicate unparseable numbers
+                    decrypted_message.append(
+                        words[position] if position < len(words) else "?"
+                    )
+                except (ValueError, IndexError):
+                    decrypted_message.append(
+                        "?"
+                    )  # Indicate unparseable numbers or out-of-range indices
         return " ".join(decrypted_message)
 
     def _find_word_by_unique_id(self, unique_id):
