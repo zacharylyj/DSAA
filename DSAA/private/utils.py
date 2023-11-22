@@ -82,16 +82,16 @@ class Utility:
         if not head or not head.nextNode:
             return head
 
-        # Split the list into two halves
+        # Split the list into two
         middle = self.get_middle(head)
         next_to_middle = middle.nextNode
         middle.nextNode = None
 
-        # Sort each half
+        # Sort the half (d&c)
         left = self.sort_linked_list(head)
         right = self.sort_linked_list(next_to_middle)
 
-        # Merge the sorted halves
+        # Merge sorted two halves
         sorted_list = self.sorted_merge(left, right)
         return sorted_list
 
@@ -103,8 +103,8 @@ class Utility:
         while current_node is not None:
             next_node = current_node.nextNode  # THIS IS FOR Storing
             current_node.nextNode = previous_node  # Reverse
-            previous_node = current_node
-            current_node = next_node
+            previous_node = current_node  # Swap
+            current_node = next_node  # Swap
 
         return previous_node
 
@@ -115,7 +115,7 @@ class Utility:
         slow = head
         fast = head.nextNode
 
-        # Move fast by two and slow by one
+        # Fast move 2 steep | Slow move 1 step
         while fast:
             fast = fast.nextNode
             if fast:
@@ -133,7 +133,7 @@ class Utility:
         elif b is None:
             return a
 
-        # Pick either a or b and recur using get_comp_key
+        # Pick a or b and recur using comp key
         if a.get_comp_key() < b.get_comp_key():
             result = a
             result.nextNode = self.sorted_merge(a.nextNode, b)
@@ -171,3 +171,16 @@ class FileSortNode:
 
     def __lt__(self, otherNode):
         return self.get_comp_key() < otherNode.get_comp_key()
+
+
+class BookNode:
+    def __init__(self, word=None, unique_id=0, nextNode=None):
+        self.word = word
+        self.unique_id = unique_id
+        self.nextNode = nextNode
+
+    def get_comp_key(self):
+        return self.unique_id
+
+    def __lt__(self, other):
+        return self.get_comp_key() < other.get_comp_key()

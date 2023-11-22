@@ -1,4 +1,4 @@
-from private.ciphertools import Ceaser, FrequencyAnalysis, Sha
+from private.ciphertools import Ceaser, FrequencyAnalysis, Sha, BookCipher
 from private.utils import FileOperator, Utility, FileSortNode, FrequencyNode
 from private.menu import Menu
 import os
@@ -15,6 +15,7 @@ class Controller:
         self.utils = Utility("password")
         self.menu = Menu()
         self.sha = Sha()
+        self.book = None
 
     def encrypt_decrypt_message(self):
         option = input("Enter 'E' for Encrypt or 'D' for Decrypt: ").upper()
@@ -248,7 +249,23 @@ class Controller:
             print("Try again")
         self.menu.select_option()
 
-    def option2(self):
-        self.utils.pwcheck()
-        print("suck")
+    def option2(self, skip_pwd=False):
+        if skip_pwd is False:
+            self.utils.pwcheck()
+        print("Private Key Matched! ✔")
+        if self.book is None:
+            self.book = BookCipher(input("Initialize with the intended Book url: "))
+
+        option = input("Enter 'E' for Encrypt or 'D' for Decrypt: ").upper()
+        if option == "E":
+            message = input("Please enter the text you want to Encrypt: ")
+            print(f"\nText: {message}\nEncrypted: {self.book.encrypt(message)}")
+        elif option == "D":
+            message = input("Please enter the text you want to Decrypt: ")
+            print(f"\nText: {message}\nDecrypted: {self.book.decrypt(message)}")
+        elif option == "Q":
+            self.menu.select_option()
+        else:
+            print("Try again")
+            self.option2(skip_pwd=True)
         self.menu.select_option()

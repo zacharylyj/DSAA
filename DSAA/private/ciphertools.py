@@ -1,4 +1,5 @@
 import string
+import requests
 
 
 class Ceaser:
@@ -168,3 +169,82 @@ class FrequencyAnalysis:
                 best_shift = shift
 
         return best_shift
+
+
+from private.utils import BookNode
+
+
+class BookCipher:
+    def __init__(self, book_url):
+        self.book_url = book_url
+        self.book_content = self._download_book()
+        self.word_map = self._create_word_map()
+        self.unrecognized_words = None
+        self.unique_id_counter = 1
+
+    def _download_book(self):
+        response = requests.get(self.book_url)
+        return response.text
+
+    def _create_word_map(self):
+        word_map = {}
+        words = self.book_content.split()
+        for index, word in enumerate(words):
+            if word in word_map:
+                word_map[word].append(index)
+            else:
+                word_map[word] = [index]
+        return word_map
+
+    def _add_unrecognized_word(self, word):
+        new_node = BookNode(word, self.unique_id_counter)
+        self.unique_id_counter += 1
+
+        if not self.unrecognized_words:
+            self.unrecognized_words = new_node
+        else:
+            # Add to the start for simplicity, but you can modify this as needed
+            new_node.nextNode = self.unrecognized_words
+            self.unrecognized_words = new_node
+
+        return new_node.unique_id
+
+    def encrypt(self, message):
+        encrypted_message = []
+        for word in message.split():
+            word_positions = self.word_map.get(word, [])
+            if word_positions:
+                encrypted_message.append(
+                    str(word_positions[0])
+                )  # Or use any other position logic
+            else:
+                # Add word to the linked list and use its unique ID for encryption
+                unique_id = self._add_unrecognized_word(word)
+                encrypted_message.append(
+                    f"#{unique_id}"
+                )  # Prefix with # to indicate unique ID
+        return " ".join(encrypted_message)
+
+    def decrypt(self, encrypted_message):
+        decrypted_message = []
+        words = self.book_content.split()
+        for token in encrypted_message.split():
+            if token.startswith("#"):
+                # Handle unrecognized word
+                unique_id = int(token[1:])
+                decrypted_message.append(self._find_word_by_unique_id(unique_id))
+            else:
+                try:
+                    position = int(token)
+                    decrypted_message.append(words[position])
+                except ValueError:
+                    decrypted_message.append("?")  # Indicate unparseable numbers
+        return " ".join(decrypted_message)
+
+    def _find_word_by_unique_id(self, unique_id):
+        current_node = self.unrecognized_words
+        while current_node:
+            if current_node.unique_id == unique_id:
+                return current_node.word
+            current_node = current_node.nextNode
+        return "?"
