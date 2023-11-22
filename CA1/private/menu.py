@@ -60,3 +60,4 @@ class Menu:
         print(
             "Bye, thanks for using ST1507 DSAA: Caesar Cipher Encrypted Message Analyzer"
         )
+        return
