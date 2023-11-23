@@ -36,7 +36,7 @@ class Ceaser:
 
 # https://en.wikipedia.org/wiki/SHA-1
 class Sha:
-    def _left_rotate(self, n, b):
+    def left_rotate(self, n, b):
         return ((n << b) | (n >> (32 - b))) & 0xFFFFFFFF
 
     def hash(self, pkey):
@@ -182,11 +182,11 @@ class BookCipher:
         self.unrecognized_words = None
         self.unique_id_counter = 1
 
-    def _download_book(self):
+    def download_book(self):
         response = requests.get(self.book_url)
         return response.text
 
-    def _create_word_map(self):
+    def create_word_map(self):
         word_map = {}
         words = self.book_content.split()
         for index, word in enumerate(words):
@@ -196,7 +196,7 @@ class BookCipher:
                 word_map[word] = [index]
         return word_map
 
-    def _add_unrecognized_word(self, word):
+    def add_unrecognized_word(self, word):
         new_node = BookNode(word, self.unique_id_counter)
         self.unique_id_counter += 1
 
@@ -232,7 +232,7 @@ class BookCipher:
             if token.startswith("#"):
                 # Handle unrecognized word
                 unique_id = int(token[1:])
-                decrypted_message.append(self._find_word_by_unique_id(unique_id))
+                decrypted_message.append(self._by_unique_id(unique_id))
             else:
                 try:
                     position = int(token)
@@ -242,10 +242,10 @@ class BookCipher:
                 except (ValueError, IndexError):
                     decrypted_message.append(
                         "?"
-                    )  # Indicate unparseable numbers or out-of-range indices
+                    )  # Indicate unparseable numbers or out-of-range indices and then set those values to "?"
         return " ".join(decrypted_message)
 
-    def _find_word_by_unique_id(self, unique_id):
+    def by_unique_id(self, unique_id):
         current_node = self.unrecognized_words
         while current_node:
             if current_node.unique_id == unique_id:
