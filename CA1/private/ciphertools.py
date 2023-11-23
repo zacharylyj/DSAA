@@ -62,7 +62,7 @@ class Sha:
             for i in range(16):
                 w[i] = int.from_bytes(chunk[i * 4 : i * 4 + 4], byteorder="big")
             for i in range(16, 80):
-                w[i] = self._left_rotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1)
+                w[i] = self.left_rotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1)
 
             a = h0
             b = h1
@@ -84,10 +84,10 @@ class Sha:
                     f = b ^ c ^ d
                     k = 0xCA62C1D6
 
-                temp = self._left_rotate(a, 5) + f + e + k + w[i] & 0xFFFFFFFF
+                temp = self.left_rotate(a, 5) + f + e + k + w[i] & 0xFFFFFFFF
                 e = d
                 d = c
-                c = self._left_rotate(b, 30)
+                c = self.left_rotate(b, 30)
                 b = a
                 a = temp
 
@@ -177,8 +177,8 @@ from private.utils import BookNode
 class BookCipher:
     def __init__(self, book_url):
         self.book_url = book_url
-        self.book_content = self._download_book()
-        self.word_map = self._create_word_map()
+        self.book_content = self.download_book()
+        self.word_map = self.create_word_map()
         self.unrecognized_words = None
         self.unique_id_counter = 1
 
@@ -219,7 +219,7 @@ class BookCipher:
                 )  # Or use any other position logic
             else:
                 # Add word to the linked list and use its unique ID for encryption
-                unique_id = self._add_unrecognized_word(word)
+                unique_id = self.add_unrecognized_word(word)
                 encrypted_message.append(
                     f"#{unique_id}"
                 )  # Prefix with # to indicate unique ID
@@ -232,7 +232,7 @@ class BookCipher:
             if token.startswith("#"):
                 # Handle unrecognized word
                 unique_id = int(token[1:])
-                decrypted_message.append(self._by_unique_id(unique_id))
+                decrypted_message.append(self.by_unique_id(unique_id))
             else:
                 try:
                     position = int(token)
